@@ -1,0 +1,14 @@
+[
+    {
+        "id": "EvnbMmW2QweA6oxMwQa8",
+        "description": "Un señor hombre",
+        "text": "Hombre",
+        "value": "MASCULINO"
+    },
+    {
+        "id": "oDHXuS6HjWknD3OAgAw0",
+        "description": "Mujer femenina",
+        "text": "Femenino",
+        "value": "FEMALE"
+    }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "3YKzGFM4KdfliuPbI3Uy",
+    "text": "Mar",
+    "description": "Gusto por cosas del mar",
+    "value": "SEA"
+  },
+  {
+    "description": "Ropa para usar puesta",
+    "id": "jVKE5gVGrlXtDKimN3XC",
+    "text": "Ropa",
+    "value": "CLOTHES"
+  },
+  {
+    "description": "Vehículos de todo tipo",
+    "text": "Vehículo",
+    "id": "oljIJShilWgyw0ICXv51",
+    "value": "VEHICULO"
+  }
+]
