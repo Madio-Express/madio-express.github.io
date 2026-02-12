@@ -51,7 +51,8 @@
         customization: {
           paymentMethods: {
             creditCard: 'all',
-            debitCard: 'all'
+            debitCard: 'all',
+            bankTransfer: 'all'
           },
           visual: {
             style: {
