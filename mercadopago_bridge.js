@@ -68,8 +68,8 @@
           },
           onSubmit: function (param) {
             var formData = param.formData;
-            // Add storeId to the request
-            formData.storeId = storeId;
+            // Add store_id to the request (snake_case to match DTO)
+            formData.store_id = storeId;
 
             console.log('MercadoPagoBridge: onSubmit, sending to backend...');
 
