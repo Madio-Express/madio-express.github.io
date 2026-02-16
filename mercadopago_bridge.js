@@ -66,17 +66,37 @@
             console.log('MercadoPagoBridge: Brick ready');
             window.dispatchEvent(new CustomEvent('mpBrickReady'));
           },
-          onSubmit: function (param) {
+          onSubmit: async function (param) {
             var formData = param.formData;
             // Add store_id to the request (snake_case to match DTO)
             formData.store_id = storeId;
 
-            // PSE bank transfers redirect the user to the bank website and back.
-            // Set callback_url to the store page so MercadoPago returns them there.
+            // Check if PSE (bank transfer) — needs order created first for callback URL
             var isPSE = formData.payment_method_id === 'pse';
+
             if (isPSE) {
-              formData.callback_url = window.location.origin + '/#/store_' + storeId;
+              // Ask Flutter to create the order and return callback URL with orderId
+              window.dispatchEvent(new CustomEvent('mpPreSubmitPse'));
+
+              var callbackUrl = await new Promise(function (resolve) {
+                function handler(e) {
+                  window.removeEventListener('mpCallbackUrlReady', handler);
+                  resolve(e.detail || '');
+                }
+                window.addEventListener('mpCallbackUrlReady', handler);
+                // Timeout after 50s (checkoutV2 has 45s timeout)
+                setTimeout(function () {
+                  window.removeEventListener('mpCallbackUrlReady', handler);
+                  resolve('');
+                }, 50000);
+              });
+
+              if (callbackUrl === 'ERROR' || !callbackUrl) {
+                throw new Error('No se pudo crear el pedido. Intenta de nuevo.');
+              }
+              formData.callback_url = callbackUrl;
             } else if (!formData.callback_url) {
+              // Credit card / debit card — unchanged behavior
               formData.callback_url = window.location.origin + window.location.pathname;
             }
 
