@@ -70,6 +70,10 @@
             var formData = param.formData;
             // Add store_id to the request (snake_case to match DTO)
             formData.store_id = storeId;
+            // PSE requires callback_url for bank redirect
+            if (!formData.callback_url) {
+              formData.callback_url = window.location.origin + window.location.pathname;
+            }
 
             console.log('MercadoPagoBridge: onSubmit, sending to backend...');
 
