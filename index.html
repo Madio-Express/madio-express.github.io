@@ -61,10 +61,12 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "225853237";
+    const serviceWorkerVersion = "1136533271";
   </script>
   <!-- MercadoPago JS SDK -->
   <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <!-- MercadoPago Device Fingerprint (fraud prevention — generates MP_DEVICE_SESSION_ID) -->
+  <script src="https://www.mercadopago.com/v2/security.js" view="checkout"></script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
   <!-- MercadoPago Payment Brick Bridge -->
