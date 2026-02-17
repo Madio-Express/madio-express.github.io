@@ -55,10 +55,17 @@
 
       var bricksBuilder = mp.bricks();
 
-      // Build initialization with payer email pre-fill
+      // Build initialization with payer pre-fill (entityType required for PSE)
       var initConfig = { amount: amount };
       if (payerData.email) {
-        initConfig.payer = { email: payerData.email };
+        initConfig.payer = {
+          email: payerData.email,
+          entityType: payerData.entityType || 'individual'
+        };
+        // Pre-fill identification if available
+        if (payerData.identification) {
+          initConfig.payer.identification = payerData.identification;
+        }
       }
 
       bricksBuilder.create('payment', containerId, {
@@ -126,6 +133,7 @@
             }
 
             console.log('MercadoPagoBridge: onSubmit, sending to backend...');
+            console.log('MercadoPagoBridge: formData =', JSON.stringify(formData, null, 2));
 
             return fetch(backendUrl, {
               method: 'POST',
