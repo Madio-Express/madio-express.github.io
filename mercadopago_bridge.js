@@ -71,13 +71,8 @@
             // Add store_id to the request (snake_case to match DTO)
             formData.store_id = storeId;
 
-            // Set callback_url based on payment method
-            var isPSE = formData.payment_method_id === 'pse';
-            if (isPSE) {
-              // PSE: redirect back to store page (order tracking handled via localStorage)
-              formData.callback_url = window.location.origin + '/#/store_' + storeId;
-            } else if (!formData.callback_url) {
-              // Credit card / debit card — unchanged behavior
+            // Set callback_url (clean URL without hash — MP may reject URLs with '#')
+            if (!formData.callback_url) {
               formData.callback_url = window.location.origin + window.location.pathname;
             }
 
