@@ -24,17 +24,28 @@
 
     /**
      * Renders the Payment Brick inside the given container.
-     * @param {string} containerId - DOM element ID to render the brick into
-     * @param {number} amount - Transaction amount
-     * @param {string} backendUrl - Backend URL for process-payment endpoint
-     * @param {string} authHeader - Authorization header value (Bearer token)
-     * @param {string} storeId - Store identifier
+     * @param {object} config - Configuration object with:
+     *   containerId, amount, backendUrl, authHeader, storeId (required),
+     *   payer: {email, firstName, lastName} (optional),
+     *   items: [{id, title, description, category_id, quantity, unit_price}] (optional),
+     *   externalReference: string (optional),
+     *   notificationUrl: string (optional)
      */
-    renderPaymentBrick: function (containerId, amount, backendUrl, authHeader, storeId) {
+    renderPaymentBrick: function (config) {
       if (!mp) {
         console.error('MercadoPagoBridge: SDK not initialized. Call init() first.');
         return;
       }
+
+      var containerId = config.containerId;
+      var amount = config.amount;
+      var backendUrl = config.backendUrl;
+      var authHeader = config.authHeader;
+      var storeId = config.storeId;
+      var payerData = config.payer || {};
+      var itemsData = config.items || [];
+      var externalRef = config.externalReference || null;
+      var notifUrl = config.notificationUrl || null;
 
       // Destroy previous brick if exists
       if (brickController) {
@@ -44,10 +55,14 @@
 
       var bricksBuilder = mp.bricks();
 
+      // Build initialization with payer email pre-fill
+      var initConfig = { amount: amount };
+      if (payerData.email) {
+        initConfig.payer = { email: payerData.email };
+      }
+
       bricksBuilder.create('payment', containerId, {
-        initialization: {
-          amount: amount
-        },
+        initialization: initConfig,
         customization: {
           paymentMethods: {
             creditCard: 'all',
@@ -74,6 +89,28 @@
             // Set callback_url (clean URL without hash — MP may reject URLs with '#')
             if (!formData.callback_url) {
               formData.callback_url = window.location.origin + window.location.pathname;
+            }
+
+            // Enrich payer data with first_name and last_name
+            if (payerData.firstName || payerData.lastName) {
+              if (!formData.payer) formData.payer = {};
+              if (payerData.firstName) formData.payer.first_name = payerData.firstName;
+              if (payerData.lastName) formData.payer.last_name = payerData.lastName;
+            }
+
+            // Add external_reference
+            if (externalRef) {
+              formData.external_reference = externalRef;
+            }
+
+            // Add notification_url
+            if (notifUrl) {
+              formData.notification_url = notifUrl;
+            }
+
+            // Add additional_info with items
+            if (itemsData.length > 0) {
+              formData.additional_info = { items: itemsData };
             }
 
             console.log('MercadoPagoBridge: onSubmit, sending to backend...');
