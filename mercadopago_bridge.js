@@ -127,6 +127,11 @@
               formData.notification_url = notifUrl;
             }
 
+            // Add statement_descriptor (appears on buyer's card statement)
+            if (config.statementDescriptor) {
+              formData.statement_descriptor = config.statementDescriptor;
+            }
+
             // Add additional_info with items
             if (itemsData.length > 0) {
               formData.additional_info = { items: itemsData };
