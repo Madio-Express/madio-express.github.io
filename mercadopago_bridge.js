@@ -8,6 +8,7 @@
   var mp = null;
   var brickController = null;
   var capturedDeviceId = ''; // Captured early in onReady for best availability
+  var cachedPublicIpv4 = null;
 
   /**
    * Attempts to capture the device session ID from all known sources.
@@ -52,6 +53,32 @@
     // Cache for subsequent calls
     if (deviceSessionId) capturedDeviceId = deviceSessionId;
     return deviceSessionId;
+  }
+
+  /**
+   * Gets the browser public IPv4 as fallback for PSE.
+   * MercadoPago PSE can reject pure IPv6 in additional_info.ip_address.
+   */
+  function getPublicIpv4() {
+    if (cachedPublicIpv4) return Promise.resolve(cachedPublicIpv4);
+
+    // api.ipify.org returns IPv4; keep timeout short to avoid blocking checkout.
+    return fetch('https://api.ipify.org?format=json', { method: 'GET' })
+      .then(function (response) {
+        if (!response.ok) return null;
+        return response.json();
+      })
+      .then(function (data) {
+        var ip = data && data.ip ? String(data.ip).trim() : '';
+        if (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) {
+          cachedPublicIpv4 = ip;
+          return ip;
+        }
+        return null;
+      })
+      .catch(function () {
+        return null;
+      });
   }
 
   window.MercadoPagoBridge = {
@@ -208,15 +235,28 @@
             console.log('MercadoPagoBridge: deviceSessionId =', deviceSessionId || '(EMPTY)');
             console.log('MercadoPagoBridge: formData =', JSON.stringify(formData, null, 2));
 
-            return fetch(backendUrl, {
-              method: 'POST',
-              headers: {
+            return getPublicIpv4().then(function (publicIpv4) {
+              if (publicIpv4) {
+                console.log('MercadoPagoBridge: publicIpv4 fallback =', publicIpv4);
+              } else {
+                console.log('MercadoPagoBridge: publicIpv4 fallback not available');
+              }
+
+              var headers = {
                 'Content-Type': 'application/json',
                 'Authorization': authHeader,
                 'X-meli-session-id': deviceSessionId,
                 'X-Idempotency-Key': idempotencyKey
-              },
-              body: JSON.stringify(formData)
+              };
+              if (publicIpv4) {
+                headers['X-client-ipv4'] = publicIpv4;
+              }
+
+              return fetch(backendUrl, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(formData)
+              });
             })
               .then(function (response) {
                 return response.json().then(function (data) {
