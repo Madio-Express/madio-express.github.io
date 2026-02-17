@@ -98,6 +98,18 @@
               if (payerData.lastName) formData.payer.last_name = payerData.lastName;
             }
 
+            // Enrich payer address (requerido para PSE)
+            if (payerData.address) {
+              if (!formData.payer) formData.payer = {};
+              formData.payer.address = payerData.address;
+            }
+
+            // Enrich payer phone (requerido para PSE)
+            if (payerData.phone) {
+              if (!formData.payer) formData.payer = {};
+              formData.payer.phone = payerData.phone;
+            }
+
             // Add external_reference
             if (externalRef) {
               formData.external_reference = externalRef;
