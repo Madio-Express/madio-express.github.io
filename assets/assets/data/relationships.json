@@ -1,14 +1,15 @@
 [
-    {
-        "description": "Esposa casada",
-        "text": "Esposa",
-        "id": "6rwPl6G0uYZTBYgsJ8sA",
-        "value": "WIFE"
-    },
-    {
-        "description": "Novia linda",
-        "id": "aJRx1q76sVz4N9YQu2gA",
-        "text": "Novia",
-        "value": "GIRL_FRIEND"
-    }
+  {"id": "1", "text": "Espos@", "root": "Espos", "value": "SPOUSE"},
+  {"id": "2", "text": "Novi@", "root": "Novi", "value": "PARTNER"},
+  {"id": "3", "text": "Padre/Madre", "male": "Padre", "female": "Madre", "value": "PARENT"},
+  {"id": "4", "text": "Herman@", "root": "Herman", "value": "SIBLING"},
+  {"id": "5", "text": "Hij@", "root": "Hij", "value": "CHILD"},
+  {"id": "6", "text": "Abuel@", "root": "Abuel", "value": "GRANDPARENT"},
+  {"id": "7", "text": "Tí@", "root": "Tí", "value": "UNCLE_AUNT"},
+  {"id": "8", "text": "Prim@", "root": "Prim", "value": "COUSIN"},
+  {"id": "9", "text": "Amig@", "root": "Amig", "value": "FRIEND"},
+  {"id": "10", "text": "Compañer@", "root": "Compañer", "value": "COLLEAGUE"},
+  {"id": "11", "text": "Suegr@", "root": "Suegr", "value": "IN_LAW"},
+  {"id": "12", "text": "Cuñad@", "root": "Cuñad", "value": "SIBLING_IN_LAW"},
+  {"id": "13", "text": "Otro", "value": "OTHER"}
 ]

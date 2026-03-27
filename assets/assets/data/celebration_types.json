@@ -1,0 +1,6 @@
+[
+  {"id": "1", "text": "Cumpleaños", "value": "BIRTHDAY"},
+  {"id": "2", "text": "Aniversario", "value": "ANNIVERSARY"},
+  {"id": "3", "text": "Graduación", "value": "GRADUATION"},
+  {"id": "4", "text": "Otro", "value": "OTHER"}
+]

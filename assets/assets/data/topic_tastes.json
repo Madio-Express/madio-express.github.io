@@ -1,20 +1,20 @@
 [
-  {
-    "id": "3YKzGFM4KdfliuPbI3Uy",
-    "text": "Mar",
-    "description": "Gusto por cosas del mar",
-    "value": "SEA"
-  },
-  {
-    "description": "Ropa para usar puesta",
-    "id": "jVKE5gVGrlXtDKimN3XC",
-    "text": "Ropa",
-    "value": "CLOTHES"
-  },
-  {
-    "description": "Vehículos de todo tipo",
-    "text": "Vehículo",
-    "id": "oljIJShilWgyw0ICXv51",
-    "value": "VEHICULO"
-  }
+  {"id": "1", "text": "Tecnología", "description": "Gadgets y electrónica", "value": "TECH"},
+  {"id": "2", "text": "Deportes", "description": "Artículos deportivos", "value": "SPORTS"},
+  {"id": "3", "text": "Libros", "description": "Lectura y literatura", "value": "BOOKS"},
+  {"id": "4", "text": "Cocina", "description": "Utensilios y gastronomía", "value": "COOKING"},
+  {"id": "5", "text": "Música", "description": "Instrumentos y audio", "value": "MUSIC"},
+  {"id": "6", "text": "Viajes", "description": "Accesorios de viaje", "value": "TRAVEL"},
+  {"id": "7", "text": "Moda", "description": "Ropa y accesorios", "value": "FASHION"},
+  {"id": "8", "text": "Belleza", "description": "Cuidado personal y cosmética", "value": "BEAUTY"},
+  {"id": "9", "text": "Hogar", "description": "Decoración y hogar", "value": "HOME"},
+  {"id": "10", "text": "Mascotas", "description": "Productos para mascotas", "value": "PETS"},
+  {"id": "11", "text": "Arte", "description": "Materiales artísticos", "value": "ART"},
+  {"id": "12", "text": "Gaming", "description": "Videojuegos y consolas", "value": "GAMING"},
+  {"id": "13", "text": "Jardinería", "description": "Plantas y jardín", "value": "GARDENING"},
+  {"id": "14", "text": "Fitness", "description": "Ejercicio y bienestar", "value": "FITNESS"},
+  {"id": "15", "text": "Cine", "description": "Películas y series", "value": "CINEMA"},
+  {"id": "16", "text": "Fotografía", "description": "Cámaras y fotografía", "value": "PHOTOGRAPHY"},
+  {"id": "17", "text": "Mar", "description": "Gusto por cosas del mar", "value": "SEA"},
+  {"id": "18", "text": "Vehículo", "description": "Vehículos de todo tipo", "value": "VEHICLE"}
 ]

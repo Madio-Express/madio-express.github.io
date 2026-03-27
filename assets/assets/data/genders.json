@@ -1,14 +1,6 @@
 [
-    {
-        "id": "EvnbMmW2QweA6oxMwQa8",
-        "description": "Un señor hombre",
-        "text": "Hombre",
-        "value": "MASCULINO"
-    },
-    {
-        "id": "oDHXuS6HjWknD3OAgAw0",
-        "description": "Mujer femenina",
-        "text": "Femenino",
-        "value": "FEMALE"
-    }
+  {"id": "1", "text": "Hombre", "description": "Género masculino", "value": "MALE"},
+  {"id": "2", "text": "Mujer", "description": "Género femenino", "value": "FEMALE"},
+  {"id": "3", "text": "No binario", "description": "Género no binario", "value": "NON_BINARY"},
+  {"id": "4", "text": "Prefiero no decir", "description": "Sin especificar", "value": "NOT_SPECIFIED"}
 ]
