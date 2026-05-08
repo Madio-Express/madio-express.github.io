@@ -1,104 +1,597 @@
-[
-  {"id": "t1", "text": "Smartphones", "description": "Celulares y accesorios", "topic_taste_id": "1", "value": "SMARTPHONES"},
-  {"id": "t2", "text": "Laptops", "description": "Computadores portátiles", "topic_taste_id": "1", "value": "LAPTOPS"},
-  {"id": "t3", "text": "Audífonos", "description": "Auriculares y audio", "topic_taste_id": "1", "value": "HEADPHONES"},
-  {"id": "t4", "text": "Smartwatch", "description": "Relojes inteligentes", "topic_taste_id": "1", "value": "SMARTWATCH"},
-  {"id": "t5", "text": "Tablets", "description": "Tabletas digitales", "topic_taste_id": "1", "value": "TABLETS"},
-  {"id": "t6", "text": "Gadgets", "description": "Accesorios tech", "topic_taste_id": "1", "value": "GADGETS"},
-
-  {"id": "t10", "text": "Fútbol", "description": "Balones y equipamiento", "topic_taste_id": "2", "value": "FOOTBALL"},
-  {"id": "t11", "text": "Baloncesto", "description": "Basketball", "topic_taste_id": "2", "value": "BASKETBALL"},
-  {"id": "t12", "text": "Ciclismo", "description": "Bicicletas y accesorios", "topic_taste_id": "2", "value": "CYCLING"},
-  {"id": "t13", "text": "Natación", "description": "Artículos de natación", "topic_taste_id": "2", "value": "SWIMMING"},
-  {"id": "t14", "text": "Running", "description": "Correr y trotar", "topic_taste_id": "2", "value": "RUNNING"},
-  {"id": "t15", "text": "Yoga", "description": "Yoga y meditación", "topic_taste_id": "2", "value": "YOGA"},
-
-  {"id": "t20", "text": "Novela", "description": "Novelas y ficción", "topic_taste_id": "3", "value": "NOVEL"},
-  {"id": "t21", "text": "Ciencia ficción", "description": "Sci-fi y fantasía", "topic_taste_id": "3", "value": "SCI_FI"},
-  {"id": "t22", "text": "Historia", "description": "Libros de historia", "topic_taste_id": "3", "value": "HISTORY"},
-  {"id": "t23", "text": "Autoayuda", "description": "Desarrollo personal", "topic_taste_id": "3", "value": "SELF_HELP"},
-  {"id": "t24", "text": "Comics", "description": "Comics y manga", "topic_taste_id": "3", "value": "COMICS"},
-
-  {"id": "t30", "text": "Repostería", "description": "Pasteles y postres", "topic_taste_id": "4", "value": "BAKING"},
-  {"id": "t31", "text": "Parrilla", "description": "BBQ y asados", "topic_taste_id": "4", "value": "GRILL"},
-  {"id": "t32", "text": "Café", "description": "Café y barismo", "topic_taste_id": "4", "value": "COFFEE"},
-  {"id": "t33", "text": "Vinos", "description": "Vinos y cata", "topic_taste_id": "4", "value": "WINE"},
-  {"id": "t34", "text": "Cocina saludable", "description": "Comida sana", "topic_taste_id": "4", "value": "HEALTHY_FOOD"},
-
-  {"id": "t40", "text": "Rock", "description": "Rock y alternativo", "topic_taste_id": "5", "value": "ROCK"},
-  {"id": "t41", "text": "Pop", "description": "Pop y mainstream", "topic_taste_id": "5", "value": "POP"},
-  {"id": "t42", "text": "Reggaeton", "description": "Reggaeton y urbano", "topic_taste_id": "5", "value": "REGGAETON"},
-  {"id": "t43", "text": "Instrumentos", "description": "Tocar instrumentos", "topic_taste_id": "5", "value": "INSTRUMENTS"},
-  {"id": "t44", "text": "Vinilos", "description": "Discos y colección", "topic_taste_id": "5", "value": "VINYL"},
-
-  {"id": "t50", "text": "Playa", "description": "Sol y arena", "topic_taste_id": "6", "value": "BEACH"},
-  {"id": "t51", "text": "Montaña", "description": "Senderismo", "topic_taste_id": "6", "value": "MOUNTAIN"},
-  {"id": "t52", "text": "Camping", "description": "Acampar", "topic_taste_id": "6", "value": "CAMPING"},
-  {"id": "t53", "text": "Maletas", "description": "Equipaje y accesorios", "topic_taste_id": "6", "value": "LUGGAGE"},
-  {"id": "t54", "text": "Mochilero", "description": "Viaje aventura", "topic_taste_id": "6", "value": "BACKPACKING"},
-
-  {"id": "t60", "text": "Zapatos", "description": "Calzado", "topic_taste_id": "7", "value": "SHOES"},
-  {"id": "t61", "text": "Bolsos", "description": "Bolsos y carteras", "topic_taste_id": "7", "value": "BAGS"},
-  {"id": "t62", "text": "Joyería", "description": "Anillos, collares", "topic_taste_id": "7", "value": "JEWELRY"},
-  {"id": "t63", "text": "Gafas", "description": "Gafas de sol", "topic_taste_id": "7", "value": "GLASSES"},
-  {"id": "t64", "text": "Ropa casual", "description": "Ropa del día a día", "topic_taste_id": "7", "value": "CASUAL_WEAR"},
-
-  {"id": "t70", "text": "Maquillaje", "description": "Cosméticos", "topic_taste_id": "8", "value": "MAKEUP"},
-  {"id": "t71", "text": "Skincare", "description": "Cuidado de piel", "topic_taste_id": "8", "value": "SKINCARE"},
-  {"id": "t72", "text": "Perfumes", "description": "Fragancias", "topic_taste_id": "8", "value": "PERFUMES"},
-  {"id": "t73", "text": "Cabello", "description": "Cuidado capilar", "topic_taste_id": "8", "value": "HAIR_CARE"},
-  {"id": "t74", "text": "Uñas", "description": "Manicure", "topic_taste_id": "8", "value": "NAILS"},
-
-  {"id": "t80", "text": "Decoración", "description": "Objetos decorativos", "topic_taste_id": "9", "value": "DECOR"},
-  {"id": "t81", "text": "Velas", "description": "Velas aromáticas", "topic_taste_id": "9", "value": "CANDLES"},
-  {"id": "t82", "text": "Cojines", "description": "Textiles hogar", "topic_taste_id": "9", "value": "CUSHIONS"},
-  {"id": "t83", "text": "Plantas interior", "description": "Plantas de interior", "topic_taste_id": "9", "value": "INDOOR_PLANTS"},
-  {"id": "t84", "text": "Organización", "description": "Orden y almacenaje", "topic_taste_id": "9", "value": "ORGANIZATION"},
-
-  {"id": "t90", "text": "Perros", "description": "Artículos para perros", "topic_taste_id": "10", "value": "DOGS"},
-  {"id": "t91", "text": "Gatos", "description": "Artículos para gatos", "topic_taste_id": "10", "value": "CATS"},
-  {"id": "t92", "text": "Acuarios", "description": "Peces y acuarios", "topic_taste_id": "10", "value": "AQUARIUMS"},
-  {"id": "t93", "text": "Aves", "description": "Pájaros", "topic_taste_id": "10", "value": "BIRDS"},
-
-  {"id": "t100", "text": "Pintura", "description": "Óleos y acrílicos", "topic_taste_id": "11", "value": "PAINTING"},
-  {"id": "t101", "text": "Dibujo", "description": "Lápices y sketch", "topic_taste_id": "11", "value": "DRAWING"},
-  {"id": "t102", "text": "Cerámica", "description": "Modelado en barro", "topic_taste_id": "11", "value": "CERAMICS"},
-  {"id": "t103", "text": "Manualidades", "description": "Crafts y DIY", "topic_taste_id": "11", "value": "CRAFTS"},
-
-  {"id": "t110", "text": "PlayStation", "description": "PS5 y juegos", "topic_taste_id": "12", "value": "PLAYSTATION"},
-  {"id": "t111", "text": "Xbox", "description": "Xbox y juegos", "topic_taste_id": "12", "value": "XBOX"},
-  {"id": "t112", "text": "Nintendo", "description": "Switch y juegos", "topic_taste_id": "12", "value": "NINTENDO"},
-  {"id": "t113", "text": "PC Gaming", "description": "Gaming en PC", "topic_taste_id": "12", "value": "PC_GAMING"},
-  {"id": "t114", "text": "Juegos de mesa", "description": "Board games", "topic_taste_id": "12", "value": "BOARD_GAMES"},
-
-  {"id": "t120", "text": "Suculentas", "description": "Plantas suculentas", "topic_taste_id": "13", "value": "SUCCULENTS"},
-  {"id": "t121", "text": "Huerta", "description": "Huerta casera", "topic_taste_id": "13", "value": "GARDEN"},
-  {"id": "t122", "text": "Flores", "description": "Arreglos florales", "topic_taste_id": "13", "value": "FLOWERS"},
-  {"id": "t123", "text": "Herramientas", "description": "Herramientas jardín", "topic_taste_id": "13", "value": "GARDEN_TOOLS"},
-
-  {"id": "t130", "text": "Pesas", "description": "Levantamiento", "topic_taste_id": "14", "value": "WEIGHTS"},
-  {"id": "t131", "text": "Crossfit", "description": "Entrenamiento funcional", "topic_taste_id": "14", "value": "CROSSFIT"},
-  {"id": "t132", "text": "Suplementos", "description": "Proteína y vitaminas", "topic_taste_id": "14", "value": "SUPPLEMENTS"},
-  {"id": "t133", "text": "Ropa deportiva", "description": "Activewear", "topic_taste_id": "14", "value": "SPORTSWEAR"},
-
-  {"id": "t140", "text": "Acción", "description": "Películas de acción", "topic_taste_id": "15", "value": "ACTION"},
-  {"id": "t141", "text": "Comedia", "description": "Humor y comedia", "topic_taste_id": "15", "value": "COMEDY"},
-  {"id": "t142", "text": "Anime", "description": "Anime y manga", "topic_taste_id": "15", "value": "ANIME"},
-  {"id": "t143", "text": "Series", "description": "Series de TV", "topic_taste_id": "15", "value": "TV_SERIES"},
-  {"id": "t144", "text": "Documentales", "description": "Documentales", "topic_taste_id": "15", "value": "DOCUMENTARIES"},
-
-  {"id": "t150", "text": "Cámara réflex", "description": "DSLR y mirrorless", "topic_taste_id": "16", "value": "DSLR"},
-  {"id": "t151", "text": "Lentes", "description": "Objetivos", "topic_taste_id": "16", "value": "LENSES"},
-  {"id": "t152", "text": "Trípodes", "description": "Soportes", "topic_taste_id": "16", "value": "TRIPODS"},
-  {"id": "t153", "text": "Álbumes", "description": "Álbumes de fotos", "topic_taste_id": "16", "value": "PHOTO_ALBUMS"},
-
-  {"id": "t160", "text": "Surf", "description": "Tablas y accesorios", "topic_taste_id": "17", "value": "SURF"},
-  {"id": "t161", "text": "Buceo", "description": "Equipo de buceo", "topic_taste_id": "17", "value": "DIVING"},
-  {"id": "t162", "text": "Pesca", "description": "Cañas y equipo", "topic_taste_id": "17", "value": "FISHING"},
-  {"id": "t163", "text": "Navegación", "description": "Vela y kayak", "topic_taste_id": "17", "value": "SAILING"},
-
-  {"id": "t170", "text": "Accesorios auto", "description": "Para el carro", "topic_taste_id": "18", "value": "CAR_ACCESSORIES"},
-  {"id": "t171", "text": "Motos", "description": "Motocicletas", "topic_taste_id": "18", "value": "MOTORCYCLES"},
-  {"id": "t172", "text": "Bicicletas", "description": "Bicis y accesorios", "topic_taste_id": "18", "value": "BICYCLES"},
-  {"id": "t173", "text": "Car detailing", "description": "Limpieza y cuidado", "topic_taste_id": "18", "value": "CAR_DETAILING"}
+﻿[
+  {
+    "id": "t1",
+    "text": "Smartphones",
+    "description": "",
+    "topic_taste_id": "1",
+    "value": "SMARTPHONES"
+  },
+  {
+    "id": "t2",
+    "text": "Laptops",
+    "description": "",
+    "topic_taste_id": "1",
+    "value": "LAPTOPS"
+  },
+  {
+    "id": "t3",
+    "text": "Audífonos",
+    "description": "",
+    "topic_taste_id": "1",
+    "value": "HEADPHONES"
+  },
+  {
+    "id": "t4",
+    "text": "Smartwatch",
+    "description": "",
+    "topic_taste_id": "1",
+    "value": "SMARTWATCH"
+  },
+  {
+    "id": "t5",
+    "text": "Tablets",
+    "description": "",
+    "topic_taste_id": "1",
+    "value": "TABLETS"
+  },
+  {
+    "id": "t6",
+    "text": "Gadgets",
+    "description": "",
+    "topic_taste_id": "1",
+    "value": "GADGETS"
+  },
+  {
+    "id": "t10",
+    "text": "Fútbol",
+    "description": "",
+    "topic_taste_id": "2",
+    "value": "FOOTBALL"
+  },
+  {
+    "id": "t11",
+    "text": "Baloncesto",
+    "description": "",
+    "topic_taste_id": "2",
+    "value": "BASKETBALL"
+  },
+  {
+    "id": "t12",
+    "text": "Ciclismo",
+    "description": "",
+    "topic_taste_id": "2",
+    "value": "CYCLING"
+  },
+  {
+    "id": "t13",
+    "text": "Natación",
+    "description": "",
+    "topic_taste_id": "2",
+    "value": "SWIMMING"
+  },
+  {
+    "id": "t14",
+    "text": "Running",
+    "description": "",
+    "topic_taste_id": "2",
+    "value": "RUNNING"
+  },
+  {
+    "id": "t15",
+    "text": "Yoga",
+    "description": "",
+    "topic_taste_id": "2",
+    "value": "YOGA"
+  },
+  {
+    "id": "t20",
+    "text": "Novela",
+    "description": "",
+    "topic_taste_id": "3",
+    "value": "NOVEL"
+  },
+  {
+    "id": "t21",
+    "text": "Ciencia ficción",
+    "description": "",
+    "topic_taste_id": "3",
+    "value": "SCI_FI"
+  },
+  {
+    "id": "t22",
+    "text": "Historia",
+    "description": "",
+    "topic_taste_id": "3",
+    "value": "HISTORY"
+  },
+  {
+    "id": "t23",
+    "text": "Autoayuda",
+    "description": "",
+    "topic_taste_id": "3",
+    "value": "SELF_HELP"
+  },
+  {
+    "id": "t24",
+    "text": "Comics",
+    "description": "",
+    "topic_taste_id": "3",
+    "value": "COMICS"
+  },
+  {
+    "id": "t30",
+    "text": "Repostería",
+    "description": "",
+    "topic_taste_id": "4",
+    "value": "BAKING"
+  },
+  {
+    "id": "t31",
+    "text": "Parrilla",
+    "description": "",
+    "topic_taste_id": "4",
+    "value": "GRILL"
+  },
+  {
+    "id": "t32",
+    "text": "Café",
+    "description": "",
+    "topic_taste_id": "4",
+    "value": "COFFEE"
+  },
+  {
+    "id": "t33",
+    "text": "Vinos",
+    "description": "",
+    "topic_taste_id": "4",
+    "value": "WINE"
+  },
+  {
+    "id": "t34",
+    "text": "Cocina saludable",
+    "description": "",
+    "topic_taste_id": "4",
+    "value": "HEALTHY_FOOD"
+  },
+  {
+    "id": "t40",
+    "text": "Rock",
+    "description": "",
+    "topic_taste_id": "5",
+    "value": "ROCK"
+  },
+  {
+    "id": "t41",
+    "text": "Pop",
+    "description": "",
+    "topic_taste_id": "5",
+    "value": "POP"
+  },
+  {
+    "id": "t42",
+    "text": "Reggaeton",
+    "description": "",
+    "topic_taste_id": "5",
+    "value": "REGGAETON"
+  },
+  {
+    "id": "t43",
+    "text": "Instrumentos",
+    "description": "",
+    "topic_taste_id": "5",
+    "value": "INSTRUMENTS"
+  },
+  {
+    "id": "t44",
+    "text": "Vinilos",
+    "description": "",
+    "topic_taste_id": "5",
+    "value": "VINYL"
+  },
+  {
+    "id": "t50",
+    "text": "Playa",
+    "description": "",
+    "topic_taste_id": "6",
+    "value": "BEACH"
+  },
+  {
+    "id": "t51",
+    "text": "Montaña",
+    "description": "",
+    "topic_taste_id": "6",
+    "value": "MOUNTAIN"
+  },
+  {
+    "id": "t52",
+    "text": "Camping",
+    "description": "",
+    "topic_taste_id": "6",
+    "value": "CAMPING"
+  },
+  {
+    "id": "t53",
+    "text": "Maletas",
+    "description": "",
+    "topic_taste_id": "6",
+    "value": "LUGGAGE"
+  },
+  {
+    "id": "t54",
+    "text": "Mochilero",
+    "description": "",
+    "topic_taste_id": "6",
+    "value": "BACKPACKING"
+  },
+  {
+    "id": "t60",
+    "text": "Zapatos",
+    "description": "",
+    "topic_taste_id": "7",
+    "value": "SHOES"
+  },
+  {
+    "id": "t61",
+    "text": "Bolsos",
+    "description": "",
+    "topic_taste_id": "7",
+    "value": "BAGS"
+  },
+  {
+    "id": "t62",
+    "text": "Joyería",
+    "description": "",
+    "topic_taste_id": "7",
+    "value": "JEWELRY"
+  },
+  {
+    "id": "t63",
+    "text": "Gafas",
+    "description": "",
+    "topic_taste_id": "7",
+    "value": "GLASSES"
+  },
+  {
+    "id": "t64",
+    "text": "Ropa casual",
+    "description": "",
+    "topic_taste_id": "7",
+    "value": "CASUAL_WEAR"
+  },
+  {
+    "id": "t70",
+    "text": "Maquillaje",
+    "description": "",
+    "topic_taste_id": "8",
+    "value": "MAKEUP"
+  },
+  {
+    "id": "t71",
+    "text": "Skincare",
+    "description": "",
+    "topic_taste_id": "8",
+    "value": "SKINCARE"
+  },
+  {
+    "id": "t72",
+    "text": "Perfumes",
+    "description": "",
+    "topic_taste_id": "8",
+    "value": "PERFUMES"
+  },
+  {
+    "id": "t73",
+    "text": "Cabello",
+    "description": "",
+    "topic_taste_id": "8",
+    "value": "HAIR_CARE"
+  },
+  {
+    "id": "t74",
+    "text": "Uñas",
+    "description": "",
+    "topic_taste_id": "8",
+    "value": "NAILS"
+  },
+  {
+    "id": "t80",
+    "text": "Decoración",
+    "description": "",
+    "topic_taste_id": "9",
+    "value": "DECOR"
+  },
+  {
+    "id": "t81",
+    "text": "Velas",
+    "description": "",
+    "topic_taste_id": "9",
+    "value": "CANDLES"
+  },
+  {
+    "id": "t82",
+    "text": "Cojines",
+    "description": "",
+    "topic_taste_id": "9",
+    "value": "CUSHIONS"
+  },
+  {
+    "id": "t83",
+    "text": "Plantas interior",
+    "description": "",
+    "topic_taste_id": "9",
+    "value": "INDOOR_PLANTS"
+  },
+  {
+    "id": "t84",
+    "text": "Organización",
+    "description": "",
+    "topic_taste_id": "9",
+    "value": "ORGANIZATION"
+  },
+  {
+    "id": "t90",
+    "text": "Perros",
+    "description": "",
+    "topic_taste_id": "10",
+    "value": "DOGS"
+  },
+  {
+    "id": "t91",
+    "text": "Gatos",
+    "description": "",
+    "topic_taste_id": "10",
+    "value": "CATS"
+  },
+  {
+    "id": "t92",
+    "text": "Acuarios",
+    "description": "",
+    "topic_taste_id": "10",
+    "value": "AQUARIUMS"
+  },
+  {
+    "id": "t93",
+    "text": "Aves",
+    "description": "",
+    "topic_taste_id": "10",
+    "value": "BIRDS"
+  },
+  {
+    "id": "t100",
+    "text": "Pintura",
+    "description": "",
+    "topic_taste_id": "11",
+    "value": "PAINTING"
+  },
+  {
+    "id": "t101",
+    "text": "Dibujo",
+    "description": "",
+    "topic_taste_id": "11",
+    "value": "DRAWING"
+  },
+  {
+    "id": "t102",
+    "text": "Cerámica",
+    "description": "",
+    "topic_taste_id": "11",
+    "value": "CERAMICS"
+  },
+  {
+    "id": "t103",
+    "text": "Manualidades",
+    "description": "",
+    "topic_taste_id": "11",
+    "value": "CRAFTS"
+  },
+  {
+    "id": "t110",
+    "text": "PlayStation",
+    "description": "",
+    "topic_taste_id": "12",
+    "value": "PLAYSTATION"
+  },
+  {
+    "id": "t111",
+    "text": "Xbox",
+    "description": "",
+    "topic_taste_id": "12",
+    "value": "XBOX"
+  },
+  {
+    "id": "t112",
+    "text": "Nintendo",
+    "description": "",
+    "topic_taste_id": "12",
+    "value": "NINTENDO"
+  },
+  {
+    "id": "t113",
+    "text": "PC Gaming",
+    "description": "",
+    "topic_taste_id": "12",
+    "value": "PC_GAMING"
+  },
+  {
+    "id": "t114",
+    "text": "Juegos de mesa",
+    "description": "",
+    "topic_taste_id": "12",
+    "value": "BOARD_GAMES"
+  },
+  {
+    "id": "t120",
+    "text": "Suculentas",
+    "description": "",
+    "topic_taste_id": "13",
+    "value": "SUCCULENTS"
+  },
+  {
+    "id": "t121",
+    "text": "Huerta",
+    "description": "",
+    "topic_taste_id": "13",
+    "value": "GARDEN"
+  },
+  {
+    "id": "t122",
+    "text": "Flores",
+    "description": "",
+    "topic_taste_id": "13",
+    "value": "FLOWERS"
+  },
+  {
+    "id": "t123",
+    "text": "Herramientas",
+    "description": "",
+    "topic_taste_id": "13",
+    "value": "GARDEN_TOOLS"
+  },
+  {
+    "id": "t130",
+    "text": "Pesas",
+    "description": "",
+    "topic_taste_id": "14",
+    "value": "WEIGHTS"
+  },
+  {
+    "id": "t131",
+    "text": "Crossfit",
+    "description": "",
+    "topic_taste_id": "14",
+    "value": "CROSSFIT"
+  },
+  {
+    "id": "t132",
+    "text": "Suplementos",
+    "description": "",
+    "topic_taste_id": "14",
+    "value": "SUPPLEMENTS"
+  },
+  {
+    "id": "t133",
+    "text": "Ropa deportiva",
+    "description": "",
+    "topic_taste_id": "14",
+    "value": "SPORTSWEAR"
+  },
+  {
+    "id": "t140",
+    "text": "Acción",
+    "description": "",
+    "topic_taste_id": "15",
+    "value": "ACTION"
+  },
+  {
+    "id": "t141",
+    "text": "Comedia",
+    "description": "",
+    "topic_taste_id": "15",
+    "value": "COMEDY"
+  },
+  {
+    "id": "t142",
+    "text": "Anime",
+    "description": "",
+    "topic_taste_id": "15",
+    "value": "ANIME"
+  },
+  {
+    "id": "t143",
+    "text": "Series",
+    "description": "",
+    "topic_taste_id": "15",
+    "value": "TV_SERIES"
+  },
+  {
+    "id": "t144",
+    "text": "Documentales",
+    "description": "",
+    "topic_taste_id": "15",
+    "value": "DOCUMENTARIES"
+  },
+  {
+    "id": "t150",
+    "text": "Cámara réflex",
+    "description": "",
+    "topic_taste_id": "16",
+    "value": "DSLR"
+  },
+  {
+    "id": "t151",
+    "text": "Lentes",
+    "description": "",
+    "topic_taste_id": "16",
+    "value": "LENSES"
+  },
+  {
+    "id": "t152",
+    "text": "Trípodes",
+    "description": "",
+    "topic_taste_id": "16",
+    "value": "TRIPODS"
+  },
+  {
+    "id": "t153",
+    "text": "Álbumes",
+    "description": "",
+    "topic_taste_id": "16",
+    "value": "PHOTO_ALBUMS"
+  },
+  {
+    "id": "t160",
+    "text": "Surf",
+    "description": "",
+    "topic_taste_id": "17",
+    "value": "SURF"
+  },
+  {
+    "id": "t161",
+    "text": "Buceo",
+    "description": "",
+    "topic_taste_id": "17",
+    "value": "DIVING"
+  },
+  {
+    "id": "t162",
+    "text": "Pesca",
+    "description": "",
+    "topic_taste_id": "17",
+    "value": "FISHING"
+  },
+  {
+    "id": "t163",
+    "text": "Navegación",
+    "description": "",
+    "topic_taste_id": "17",
+    "value": "SAILING"
+  },
+  {
+    "id": "t170",
+    "text": "Accesorios auto",
+    "description": "",
+    "topic_taste_id": "18",
+    "value": "CAR_ACCESSORIES"
+  },
+  {
+    "id": "t171",
+    "text": "Motos",
+    "description": "",
+    "topic_taste_id": "18",
+    "value": "MOTORCYCLES"
+  },
+  {
+    "id": "t172",
+    "text": "Bicicletas",
+    "description": "",
+    "topic_taste_id": "18",
+    "value": "BICYCLES"
+  },
+  {
+    "id": "t173",
+    "text": "Car detailing",
+    "description": "",
+    "topic_taste_id": "18",
+    "value": "CAR_DETAILING"
+  }
 ]
