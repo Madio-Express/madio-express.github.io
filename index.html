@@ -60,10 +60,10 @@
   <link rel="manifest" href="manifest.json">
 
   <script>
-    // Compatibilidad con links viejos: en dominios propios (edge-proxy) la app
-    // usa path URLs, así que un link compartido como /#/tienda_57/product_196
-    // se convierte a /tienda_57/product_196 antes de que Flutter lea la ruta.
-    // En GitHub Pages (hosting estático, sin rewrites) se conserva el hash.
+    // Backwards compatibility with old links: on custom domains (edge-proxy)
+    // the app uses path URLs, so a shared link like /#/store_57/product_196
+    // is converted to /store_57/product_196 before Flutter reads the route.
+    // On GitHub Pages (static hosting, no rewrites) the hash is kept.
     (function () {
       if (window.location.host === 'madio-express.github.io') return;
       var hash = window.location.hash;
@@ -75,7 +75,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "2738699335";
+    const serviceWorkerVersion = "1659702758";
   </script>
   <!-- MercadoPago JS SDK -->
   <script src="https://sdk.mercadopago.com/js/v2"></script>
