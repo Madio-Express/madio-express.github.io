@@ -120,7 +120,22 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "2335245064";
+    const serviceWorkerVersion = "3024445049";
+  </script>
+
+  <script>
+    // Defensive: drop any previously-installed Flutter service worker. A stale
+    // SW cache served customers a pre-security-migration main.dart.js that called
+    // now-dead authenticated endpoints (/store/store/{id}, vercel supply-chain)
+    // → 401/CORS → store failed to load on first try. This storefront is
+    // online-only, so we no longer register a SW (see the loader below); already
+    // poisoned clients are healed by the killswitch flutter_service_worker.js
+    // (tool/disable_service_worker.js). No reload here to avoid loops.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (r) { r.unregister(); });
+      }).catch(function () {});
+    }
   </script>
   <!-- MercadoPago JS SDK — deferred: only needed at checkout, so it must not
        block the initial engine boot. `defer` keeps document order, so it still
@@ -173,11 +188,12 @@
 
   <script>
     window.addEventListener('load', function (ev) {
-      // Download main.dart.js
+      // Download main.dart.js WITHOUT registering a service worker. Stale SW
+      // caching is what served customers an outdated build after the security
+      // migration; for an online-only storefront the offline cache isn't worth
+      // breaking deploys. New visitors install no SW; deploys take effect on the
+      // next load.
       _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
         onEntrypointLoaded: function (engineInitializer) {
           engineInitializer.initializeEngine().then(function (appRunner) {
             appRunner.runApp();
