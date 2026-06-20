@@ -23,6 +23,16 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Visita nuestra Tienda Virtual">
 
+  <!-- Warm up connections to the origins the first paint needs, in parallel
+       with HTML parsing: the store API gateway (store + products fetch),
+       gstatic (CanvasKit + Firebase JS), Google Fonts, and Firebase auth.
+       Saves the TCP/TLS round-trips off the critical path. -->
+  <link rel="preconnect" href="https://virtual-store-api-gateway-609036400323.us-central1.run.app" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <!-- <meta property="og:url" content="https://teregalo.com/"> -->
@@ -120,7 +130,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "3285568063";
+    const serviceWorkerVersion = "1381366027";
   </script>
 
   <script>
@@ -137,16 +147,44 @@
       }).catch(function () {});
     }
   </script>
-  <!-- MercadoPago JS SDK — deferred: only needed at checkout, so it must not
-       block the initial engine boot. `defer` keeps document order, so it still
-       runs before mercadopago_bridge.js below. -->
-  <script src="https://sdk.mercadopago.com/js/v2" defer></script>
-  <!-- MercadoPago Device Fingerprint (fraud prevention — generates MP_DEVICE_SESSION_ID) -->
-  <script src="https://www.mercadopago.com/v2/security.js" view="checkout" defer></script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
-  <!-- MercadoPago Payment Brick Bridge -->
-  <script src="mercadopago_bridge.js" defer></script>
+
+  <!-- MercadoPago SDK is loaded ON DEMAND (only when the user reaches the MP
+       payment step), not on every visit. This keeps ~3 script downloads and a
+       device-fingerprint XHR off the initial cold start, which most visitors
+       (contra-entrega / transferencia) never need. window.loadMercadoPagoSdk()
+       is idempotent and resolves once window.MercadoPagoBridge is ready; the
+       payment brick widget triggers it and waits before rendering. -->
+  <script>
+    (function () {
+      var mpPromise = null;
+      function loadScript(src, attrs) {
+        return new Promise(function (resolve, reject) {
+          var s = document.createElement('script');
+          s.src = src;
+          if (attrs) {
+            Object.keys(attrs).forEach(function (k) { s.setAttribute(k, attrs[k]); });
+          }
+          s.onload = function () { resolve(); };
+          s.onerror = function () { reject(new Error('Failed to load ' + src)); };
+          document.head.appendChild(s);
+        });
+      }
+      // Order matters: SDK first, then security.js (device fingerprint), then
+      // the bridge (reads the SDK global and defines window.MercadoPagoBridge).
+      window.loadMercadoPagoSdk = function () {
+        if (mpPromise) return mpPromise;
+        mpPromise = loadScript('https://sdk.mercadopago.com/js/v2')
+          .then(function () {
+            return loadScript('https://www.mercadopago.com/v2/security.js', { view: 'checkout' });
+          })
+          .then(function () { return loadScript('mercadopago_bridge.js'); })
+          .catch(function (e) { mpPromise = null; throw e; });
+        return mpPromise;
+      };
+    })();
+  </script>
 </head>
 
 <body>
@@ -157,22 +195,10 @@
     <div class="app-splash__label">Cargando…</div>
   </div>
 
-  <!-- <script src="main.dart.js?version=2" type="application/javascript" ></script> -->
-  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAR2vtl3GLEqRn4TZIt0hohStATwEZdYm8",
-      projectId: "madio-express",
-      messagingSenderId: "448161361563",
-      appId: "1:448161361563:web:58b74860311ff11bb5e03e",
-    };
-
-    //const app = initializeApp(firebaseConfig); 
-    //const analytics = getAnalytics(app); 
-
-  </script>
+  <!-- Firebase JS is auto-injected by the firebase_core / firebase_auth Flutter
+       plugins (v3/v5). The old manual 8.6.1 compat <script> tags + config block
+       were unused (initializeApp was already commented out) and only added two
+       blocking downloads on every load, so they were removed. -->
 
   <script>
     // Remove the instant splash as soon as Flutter paints its first frame.
