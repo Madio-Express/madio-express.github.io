@@ -228,6 +228,87 @@
       });
     });
   </script>
+
+  <script>
+    // "New version" banner WITHOUT a service worker. This storefront
+    // deliberately registers none (a stale SW cache once served a broken build
+    // after the security migration), so we can't rely on the SW update cycle.
+    // Instead we poll the deployed main.dart.js fingerprint (ETag /
+    // Last-Modified) and, when it changes, invite the user to reload so a
+    // long-lived tab never keeps running an outdated build.
+    (function () {
+      var ASSET = 'main.dart.js';
+      var baseline = null;
+
+      function fingerprint() {
+        // Cache-busting query + no-store defeats both the browser and the CDN
+        // edge cache, so we always read the version currently at the origin.
+        return fetch(ASSET + '?_v=' + Date.now(), { method: 'HEAD', cache: 'no-store' })
+          .then(function (res) {
+            if (!res.ok) return null;
+            return res.headers.get('etag') ||
+                   res.headers.get('last-modified') ||
+                   res.headers.get('content-length');
+          })
+          .catch(function () { return null; });
+      }
+
+      function showUpdateBanner() {
+        if (document.getElementById('app-update-banner')) return;
+        var style = document.createElement('style');
+        style.textContent =
+          '#app-update-banner{position:fixed;left:50%;bottom:24px;' +
+          'transform:translateX(-50%) translateY(160%);display:flex;align-items:center;' +
+          'gap:14px;padding:12px 14px 12px 20px;border-radius:14px;background:#FFFFFF;' +
+          'color:#2A2A2A;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;' +
+          'font-size:14px;box-shadow:0 10px 40px rgba(90,50,105,.25);' +
+          'border:1px solid rgba(90,50,105,.18);z-index:2147483647;' +
+          'transition:transform .35s cubic-bezier(.2,.8,.2,1);max-width:calc(100vw - 32px)}' +
+          '#app-update-banner.app-update-banner--in{transform:translateX(-50%) translateY(0)}' +
+          '#app-update-banner .aub-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+          '#app-update-banner .aub-reload{cursor:pointer;border:0;border-radius:9px;' +
+          'padding:8px 16px;font-weight:600;font-size:14px;background:#5A3269;color:#fff}' +
+          '#app-update-banner .aub-reload:hover{background:#6d3d80}' +
+          '#app-update-banner .aub-close{cursor:pointer;border:0;background:transparent;' +
+          'color:#9A8AA0;font-size:20px;line-height:1;padding:0 4px}' +
+          '#app-update-banner .aub-close:hover{color:#2A2A2A}';
+        document.head.appendChild(style);
+
+        var bar = document.createElement('div');
+        bar.id = 'app-update-banner';
+        bar.setAttribute('role', 'status');
+        bar.innerHTML =
+          '<span class="aub-text">Hay una nueva versión disponible</span>' +
+          '<button type="button" class="aub-reload">Actualizar</button>' +
+          '<button type="button" class="aub-close" aria-label="Cerrar">×</button>';
+        document.body.appendChild(bar);
+        requestAnimationFrame(function () { bar.classList.add('app-update-banner--in'); });
+
+        bar.querySelector('.aub-reload').addEventListener('click', function () {
+          window.location.reload();
+        });
+        bar.querySelector('.aub-close').addEventListener('click', function () {
+          bar.classList.remove('app-update-banner--in');
+          setTimeout(function () { if (bar.parentNode) bar.remove(); }, 350);
+        });
+      }
+
+      function check() {
+        fingerprint().then(function (fp) {
+          if (!fp) return;
+          if (baseline === null) { baseline = fp; return; }
+          if (fp !== baseline) showUpdateBanner();
+        });
+      }
+
+      // Establish the baseline now, then re-check every 5 min and on tab focus.
+      check();
+      setInterval(check, 5 * 60 * 1000);
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') check();
+      });
+    })();
+  </script>
 </body>
 
 </html>
