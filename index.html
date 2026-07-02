@@ -130,7 +130,19 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "3107345445";
+    const serviceWorkerVersion = "374010144";
+  </script>
+
+  <script>
+    // Deploy stamp: tool/deploy_web.ps1 replaces the placeholder with a unique
+    // build id (git sha + timestamp) and writes the same id to
+    // build_version.txt. Together they give cache-proof updates: the entrypoint
+    // is fetched as main.dart.js?v=<id> (URL changes every deploy, so the HTTP
+    // cache can never serve a stale bundle) and the update checker at the
+    // bottom compares this baked id against the deployed one. In local dev the
+    // placeholder stays as-is and both mechanisms turn themselves off.
+    var appBuildId = '1c33c13-20260702183506';
+    var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
   <script>
@@ -220,6 +232,8 @@
       // breaking deploys. New visitors install no SW; deploys take effect on the
       // next load.
       _flutter.loader.loadEntrypoint({
+        // Versioned URL = hard cache-bust on every deploy (see appBuildId).
+        entrypointUrl: appBuildIdIsReal ? 'main.dart.js?v=' + appBuildId : 'main.dart.js',
         onEntrypointLoaded: function (engineInitializer) {
           engineInitializer.initializeEngine().then(function (appRunner) {
             appRunner.runApp();
@@ -230,25 +244,31 @@
   </script>
 
   <script>
-    // "New version" banner WITHOUT a service worker. This storefront
-    // deliberately registers none (a stale SW cache once served a broken build
-    // after the security migration), so we can't rely on the SW update cycle.
-    // Instead we poll the deployed main.dart.js fingerprint (ETag /
-    // Last-Modified) and, when it changes, invite the user to reload so a
-    // long-lived tab never keeps running an outdated build.
+    // Auto-update WITHOUT a service worker. This storefront deliberately
+    // registers none (a stale SW cache once served a broken build after the
+    // security migration), so we can't rely on the SW update cycle. Instead
+    // the page knows its own build id (appBuildId, baked at deploy) and
+    // compares it against build_version.txt at the origin. The old approach
+    // (ETag baseline read at load) could never detect that the PAGE ITSELF
+    // was stale — this one can. Behavior:
+    //   - stale detected at page load or when returning to the tab -> reload
+    //     silently once (nothing in progress to lose; the cart persists).
+    //   - stale detected mid-session (5-min poll) -> non-intrusive banner.
+    //   - anti-loop guard: if we already auto-reloaded for a given remote id
+    //     (Pages edge can serve the old index.html for up to ~10 min), fall
+    //     back to the banner instead of reloading again.
     (function () {
-      var ASSET = 'main.dart.js';
-      var baseline = null;
+      if (!appBuildIdIsReal) return; // local dev: no deploy stamp, no checker
 
-      function fingerprint() {
+      var RELOADED_KEY = 'app_update_reloaded_to';
+
+      function fetchDeployedId() {
         // Cache-busting query + no-store defeats both the browser and the CDN
         // edge cache, so we always read the version currently at the origin.
-        return fetch(ASSET + '?_v=' + Date.now(), { method: 'HEAD', cache: 'no-store' })
+        return fetch('build_version.txt?_v=' + Date.now(), { cache: 'no-store' })
           .then(function (res) {
             if (!res.ok) return null;
-            return res.headers.get('etag') ||
-                   res.headers.get('last-modified') ||
-                   res.headers.get('content-length');
+            return res.text().then(function (t) { return (t || '').trim() || null; });
           })
           .catch(function () { return null; });
       }
@@ -293,19 +313,32 @@
         });
       }
 
-      function check() {
-        fingerprint().then(function (fp) {
-          if (!fp) return;
-          if (baseline === null) { baseline = fp; return; }
-          if (fp !== baseline) showUpdateBanner();
+      function tryAutoReload(remoteId) {
+        var alreadyTried = null;
+        try { alreadyTried = sessionStorage.getItem(RELOADED_KEY); } catch (e) {}
+        if (alreadyTried === remoteId) {
+          // We already reloaded for this deploy and still got the old page
+          // (stale index.html at the edge). Don't loop — just offer the banner.
+          showUpdateBanner();
+          return;
+        }
+        try { sessionStorage.setItem(RELOADED_KEY, remoteId); } catch (e) {}
+        window.location.reload();
+      }
+
+      // silent=true (page load / tab became visible): reload without asking.
+      // silent=false (mid-session poll): show the banner, never yank the page.
+      function check(silent) {
+        fetchDeployedId().then(function (remoteId) {
+          if (!remoteId || remoteId === appBuildId) return;
+          if (silent) { tryAutoReload(remoteId); } else { showUpdateBanner(); }
         });
       }
 
-      // Establish the baseline now, then re-check every 5 min and on tab focus.
-      check();
-      setInterval(check, 5 * 60 * 1000);
+      check(true);
+      setInterval(function () { check(false); }, 5 * 60 * 1000);
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible') check();
+        if (document.visibilityState === 'visible') check(true);
       });
     })();
   </script>
