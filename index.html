@@ -130,7 +130,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "374010144";
+    const serviceWorkerVersion = "3457939576";
   </script>
 
   <script>
@@ -141,7 +141,7 @@
     // cache can never serve a stale bundle) and the update checker at the
     // bottom compares this baked id against the deployed one. In local dev the
     // placeholder stays as-is and both mechanisms turn themselves off.
-    var appBuildId = '1c33c13-20260702183506';
+    var appBuildId = '56eaaae-20260702191221';
     var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
@@ -262,13 +262,24 @@
 
       var RELOADED_KEY = 'app_update_reloaded_to';
 
+      // A build id looks like "<git sha>-<yyyyMMddHHmmss>". Anything else is
+      // NOT a version: custom domains sit behind the edge-proxy, whose SPA
+      // fallback answered /build_version.txt with a full index.html before it
+      // learned to pass .txt through — comparing that HTML against appBuildId
+      // made the update banner permanent (2026-07-02). Never trust content
+      // that doesn't match the shape.
+      var BUILD_ID_SHAPE = /^[0-9a-f]{6,40}-\d{8,17}$/i;
+
       function fetchDeployedId() {
         // Cache-busting query + no-store defeats both the browser and the CDN
         // edge cache, so we always read the version currently at the origin.
         return fetch('build_version.txt?_v=' + Date.now(), { cache: 'no-store' })
           .then(function (res) {
             if (!res.ok) return null;
-            return res.text().then(function (t) { return (t || '').trim() || null; });
+            return res.text().then(function (t) {
+              var id = (t || '').trim();
+              return BUILD_ID_SHAPE.test(id) ? id : null;
+            });
           })
           .catch(function () { return null; });
       }
