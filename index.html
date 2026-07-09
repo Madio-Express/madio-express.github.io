@@ -71,17 +71,17 @@
 
   <!-- Instant splash shown before the Flutter engine boots, so the user never
        stares at a blank white page while main.dart.js + CanvasKit download.
-       Removed on the `flutter-first-frame` event (see script at end of body). -->
+       Instead of a generic spinner it renders a store-shaped skeleton (header +
+       hero + product grid shimmer) and hydrates the store name/logo from
+       localStorage (repeat visits, instant) or from the store prefetch below
+       (first visit). Removed on `flutter-first-frame` (script at end of body). -->
   <style>
     #app-splash {
       position: fixed;
       inset: 0;
       z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #FBFBFB;
+      background: #FFFFFF;
+      overflow: hidden;
       transition: opacity 0.35s ease;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
@@ -91,26 +91,119 @@
       pointer-events: none;
     }
 
-    #app-splash .app-splash__spinner {
-      width: 44px;
-      height: 44px;
-      border: 3px solid rgba(90, 50, 105, 0.15);
-      border-top-color: #5A3269;
+    #app-splash .sk-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 20px 0;
+    }
+
+    #app-splash .sk {
+      background: linear-gradient(90deg, #F1EFF2 25%, #FAF8FB 50%, #F1EFF2 75%);
+      background-size: 200% 100%;
+      animation: sk-shimmer 1.4s ease-in-out infinite;
+      border-radius: 10px;
+    }
+
+    @keyframes sk-shimmer {
+      from { background-position: 200% 0; }
+      to { background-position: -200% 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #app-splash .sk { animation: none; }
+    }
+
+    #app-splash .sk-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      margin-bottom: 14px;
+    }
+
+    #app-splash .sk-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    #app-splash .sk-logo {
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      animation: app-splash-spin 0.9s linear infinite;
+      flex: none;
+      position: relative;
+      overflow: hidden;
     }
 
-    #app-splash .app-splash__label {
-      margin-top: 16px;
-      color: #5A3269;
-      font-size: 14px;
-      letter-spacing: 0.3px;
+    #app-splash .sk-logo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.25s ease;
     }
 
-    @keyframes app-splash-spin {
-      to {
-        transform: rotate(360deg);
-      }
+    #app-splash .sk-logo img.sk-logo-img--in { opacity: 1; }
+
+    #app-splash .sk-name-line {
+      width: 140px;
+      height: 14px;
+      border-radius: 7px;
+    }
+
+    #app-splash .sk-store-name {
+      display: none;
+      color: #241B27;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60vw;
+    }
+
+    #app-splash .sk-cart {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      flex: none;
+    }
+
+    #app-splash .sk-hero {
+      height: clamp(160px, 30vh, 320px);
+      border-radius: 18px;
+      margin-bottom: 22px;
+    }
+
+    #app-splash .sk-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 18px 14px;
+    }
+
+    #app-splash .sk-card .sk-img {
+      width: 100%;
+      padding-top: 100%;
+      border-radius: 14px;
+    }
+
+    #app-splash .sk-card .sk-l1 {
+      height: 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      width: 80%;
+    }
+
+    #app-splash .sk-card .sk-l2 {
+      height: 12px;
+      border-radius: 6px;
+      margin-top: 6px;
+      width: 45%;
     }
   </style>
 
@@ -129,8 +222,103 @@
   </script>
 
   <script>
+    // Store prefetch: start the store GET at HTML-parse time, in parallel with
+    // main.dart.js download + parse + engine boot. Without this, the store
+    // fetch only starts once Dart is running (~0.5s in), so the visible
+    // "content ready" moment pays engine boot + fetch SEQUENTIALLY. The Dart
+    // side (lib/data/store_prefetch_web.dart) consumes window.__storePrefetch
+    // one-shot; if anything here fails, promises resolve to null and Dart
+    // falls back to its normal network path (retry + typed errors intact).
+    // Must run AFTER the hash->path script above so pathname is canonical.
+    (function () {
+      var API = 'https://virtual-store-api-gateway-609036400323.us-central1.run.app';
+      var host = window.location.host;
+
+      // Never let a hung prefetch block the app: settle with null after 8s and
+      // let the Dart retry path (15s per attempt, cold-start aware) take over.
+      function withTimeout(promise, ms) {
+        return new Promise(function (resolve) {
+          var t = setTimeout(function () { resolve(null); }, ms);
+          promise.then(
+            function (v) { clearTimeout(t); resolve(v); },
+            function () { clearTimeout(t); resolve(null); }
+          );
+        });
+      }
+
+      function fetchText(url) {
+        // No headers: keeps this a "simple" CORS request (no preflight).
+        return withTimeout(
+          fetch(url).then(function (r) { return r.ok ? r.text() : null; }),
+          8000
+        );
+      }
+
+      // Mirror of extractStoreId in lib/presentation/util/route_parser.dart:
+      // first path (or hash) segment whose tail after the LAST underscore is
+      // numeric (teregalo_55, pet_store_55, store_30).
+      function storeIdFromUrl() {
+        var route = window.location.pathname;
+        if (window.location.hash.indexOf('#/') === 0) route = window.location.hash.slice(1);
+        route = route.split('?')[0];
+        var segs = route.split('/');
+        for (var i = 0; i < segs.length; i++) {
+          var m = /_(\d+)$/.exec(segs[i]);
+          if (m) return m[1];
+        }
+        return null;
+      }
+
+      // github.io root is the mall (no store); localhost is dev. Any other
+      // host is a custom domain that maps to one store via the resolve endpoint.
+      var isCustomDomain = host.indexOf('github.io') === -1 &&
+        host.indexOf('localhost') === -1 &&
+        host.indexOf('127.0.0.1') === -1;
+
+      var slugId = storeIdFromUrl();
+
+      var storeIdPromise;
+      if (slugId) {
+        storeIdPromise = Promise.resolve(slugId);
+      } else if (isCustomDomain) {
+        storeIdPromise = fetchText(API + '/store/store/resolve?host=' + encodeURIComponent(host))
+          .then(function (t) {
+            if (!t) return null;
+            try {
+              var d = JSON.parse(t);
+              var id = (d.storeId != null) ? d.storeId : d.id;
+              return (id != null) ? String(id) : null;
+            } catch (e) { return null; }
+          });
+      } else {
+        storeIdPromise = Promise.resolve(null);
+      }
+
+      var storePromise = storeIdPromise.then(function (id) {
+        if (!id) return null;
+        return fetchText(API + '/store/public/store/' + id).then(function (t) {
+          return t ? { id: id, json: t } : null;
+        });
+      });
+
+      window.__storePrefetch = {
+        // Promise<string|null>: store id from the URL slug or host resolve.
+        storeId: storeIdPromise,
+        // Promise<{id, json}|null>: raw JSON text of GET /store/public/store/{id}.
+        store: storePromise,
+        // One-shot flags set by the Dart consumers (a second read must go to
+        // the network, e.g. when the user navigates to another store).
+        storeIdConsumed: false,
+        storeConsumed: false,
+        // localStorage key part for the splash identity cache below.
+        cacheKey: slugId ? 'store:' + slugId : 'host:' + host
+      };
+    })();
+  </script>
+
+  <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "1854936676";
+    const serviceWorkerVersion = "1907094620";
   </script>
 
   <script>
@@ -141,7 +329,7 @@
     // cache can never serve a stale bundle) and the update checker at the
     // bottom compares this baked id against the deployed one. In local dev the
     // placeholder stays as-is and both mechanisms turn themselves off.
-    var appBuildId = '64cd81c-20260708224354';
+    var appBuildId = '4633da9-20260709122221';
     var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
@@ -201,11 +389,83 @@
 
 <body>
   <!-- Instant splash (styled in <head>). Painted by the browser immediately,
-       removed once Flutter rasterizes its first frame. -->
-  <div id="app-splash">
-    <div class="app-splash__spinner"></div>
-    <div class="app-splash__label">Cargando…</div>
+       removed once Flutter rasterizes its first frame. Store-shaped skeleton:
+       header (logo + name + cart), hero banner, product grid. -->
+  <div id="app-splash" aria-hidden="true">
+    <div class="sk-page">
+      <div class="sk-header">
+        <div class="sk-brand">
+          <div class="sk sk-logo"><img id="sk-logo-img" alt=""></div>
+          <div class="sk sk-name-line" id="sk-name-ph"></div>
+          <div class="sk-store-name" id="sk-store-name"></div>
+        </div>
+        <div class="sk sk-cart"></div>
+      </div>
+      <div class="sk sk-hero"></div>
+      <div class="sk-grid">
+        <div class="sk-card"><div class="sk sk-img"></div><div class="sk sk-l1"></div><div class="sk sk-l2"></div></div>
+        <div class="sk-card"><div class="sk sk-img"></div><div class="sk sk-l1"></div><div class="sk sk-l2"></div></div>
+        <div class="sk-card"><div class="sk sk-img"></div><div class="sk sk-l1"></div><div class="sk sk-l2"></div></div>
+        <div class="sk-card"><div class="sk sk-img"></div><div class="sk sk-l1"></div><div class="sk sk-l2"></div></div>
+        <div class="sk-card"><div class="sk sk-img"></div><div class="sk sk-l1"></div><div class="sk sk-l2"></div></div>
+        <div class="sk-card"><div class="sk sk-img"></div><div class="sk sk-l1"></div><div class="sk sk-l2"></div></div>
+        <div class="sk-card"><div class="sk sk-img"></div><div class="sk sk-l1"></div><div class="sk sk-l2"></div></div>
+        <div class="sk-card"><div class="sk sk-img"></div><div class="sk sk-l1"></div><div class="sk sk-l2"></div></div>
+      </div>
+    </div>
   </div>
+
+  <script>
+    // Splash identity: paint the store's name + logo inside the skeleton so the
+    // wait reads as "this store is drawing" instead of a generic loader.
+    // Two sources, fastest wins:
+    //   1. localStorage (identity seen on a previous visit) -> instant.
+    //   2. The store prefetch above -> first visit, usually well before the
+    //      first Flutter frame. Also refreshes the cache.
+    // Only the name (textContent, XSS-safe) and an https logo URL are used.
+    (function () {
+      var pf = window.__storePrefetch;
+      var KEY = 'splash_identity_v1:' + (pf && pf.cacheKey ? pf.cacheKey : 'host:' + window.location.host);
+
+      function apply(identity) {
+        if (!identity) return;
+        if (identity.name) {
+          var ph = document.getElementById('sk-name-ph');
+          var nm = document.getElementById('sk-store-name');
+          if (ph && nm) {
+            nm.textContent = identity.name;
+            ph.style.display = 'none';
+            nm.style.display = 'block';
+          }
+        }
+        if (identity.logoUrl && /^https:\/\//i.test(identity.logoUrl)) {
+          var img = document.getElementById('sk-logo-img');
+          if (img && img.getAttribute('src') !== identity.logoUrl) {
+            img.onload = function () { img.classList.add('sk-logo-img--in'); };
+            img.src = identity.logoUrl;
+          }
+        }
+      }
+
+      var cached = null;
+      try { cached = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+      apply(cached);
+
+      if (pf && pf.store && typeof pf.store.then === 'function') {
+        pf.store.then(function (r) {
+          if (!r || !r.json) return;
+          var s;
+          try { s = JSON.parse(r.json); } catch (e) { return; }
+          var identity = { name: s.name || '', logoUrl: s.logoUrl || '' };
+          if (!identity.name && !identity.logoUrl) return;
+          if (!cached || cached.name !== identity.name || cached.logoUrl !== identity.logoUrl) {
+            apply(identity);
+            try { localStorage.setItem(KEY, JSON.stringify(identity)); } catch (e) {}
+          }
+        });
+      }
+    })();
+  </script>
 
   <!-- Firebase JS is auto-injected by the firebase_core / firebase_auth Flutter
        plugins (v3/v5). The old manual 8.6.1 compat <script> tags + config block
