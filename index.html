@@ -130,7 +130,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "3738983816";
+    const serviceWorkerVersion = "379278365";
   </script>
 
   <script>
@@ -141,7 +141,7 @@
     // cache can never serve a stale bundle) and the update checker at the
     // bottom compares this baked id against the deployed one. In local dev the
     // placeholder stays as-is and both mechanisms turn themselves off.
-    var appBuildId = '01a23c3-20260706163803';
+    var appBuildId = '01a23c3-20260708204241';
     var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
@@ -233,7 +233,14 @@
       // next load.
       _flutter.loader.loadEntrypoint({
         // Versioned URL = hard cache-bust on every deploy (see appBuildId).
-        entrypointUrl: appBuildIdIsReal ? 'main.dart.js?v=' + appBuildId : 'main.dart.js',
+        // Absolute path (leading slash): flutter.js resolves entrypointUrl with
+        // `new URL(t, window.location)`, which IGNORES <base href="/"> and
+        // resolves relative to the current URL's directory. On a cold load of a
+        // multi-segment deep link (e.g. /store_55/product_172, shared via
+        // WhatsApp or a refresh) a relative 'main.dart.js' resolves to
+        // /store_55/main.dart.js → 404 and the app never boots. A root-absolute
+        // path always resolves to /main.dart.js regardless of route depth.
+        entrypointUrl: appBuildIdIsReal ? '/main.dart.js?v=' + appBuildId : '/main.dart.js',
         onEntrypointLoaded: function (engineInitializer) {
           engineInitializer.initializeEngine().then(function (appRunner) {
             appRunner.runApp();
