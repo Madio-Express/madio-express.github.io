@@ -318,7 +318,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "1907094620";
+    const serviceWorkerVersion = "2300628087";
   </script>
 
   <script>
@@ -329,7 +329,7 @@
     // cache can never serve a stale bundle) and the update checker at the
     // bottom compares this baked id against the deployed one. In local dev the
     // placeholder stays as-is and both mechanisms turn themselves off.
-    var appBuildId = '4633da9-20260709122221';
+    var appBuildId = '4633da9-20260709122735';
     var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
@@ -460,7 +460,17 @@
           if (!identity.name && !identity.logoUrl) return;
           if (!cached || cached.name !== identity.name || cached.logoUrl !== identity.logoUrl) {
             apply(identity);
-            try { localStorage.setItem(KEY, JSON.stringify(identity)); } catch (e) {}
+            try {
+              var payload = JSON.stringify(identity);
+              localStorage.setItem(KEY, payload);
+              // Also key by store id: a root visit on a custom domain caches
+              // under host:<domain>, but Flutter then rewrites the URL to
+              // /name_<id>, so the first refresh looks up store:<id>. Writing
+              // both makes identity instant from the very first refresh.
+              if (s.id != null) {
+                localStorage.setItem('splash_identity_v1:store:' + s.id, payload);
+              }
+            } catch (e) {}
           }
         });
       }
