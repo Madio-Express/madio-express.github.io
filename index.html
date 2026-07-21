@@ -301,15 +301,39 @@
         });
       });
 
+      // Products and campaigns are also public reads on the boot critical
+      // path: the shop controller needs the product list before anything
+      // renders, and a /campaign_N deep link additionally needs the active
+      // campaigns to resolve its destination. Measured without prefetch they
+      // started at ~1.3s and ~5.5s respectively; here they start with the
+      // store fetch.
+      var productsPromise = storeIdPromise.then(function (id) {
+        if (!id) return null;
+        return fetchText(API + '/warehouse/productsmodule/store/' + id + '/products-to-show/public')
+          .then(function (t) { return t ? { id: id, json: t } : null; });
+      });
+
+      var campaignsPromise = storeIdPromise.then(function (id) {
+        if (!id) return null;
+        return fetchText(API + '/store/campaigns/active/' + id)
+          .then(function (t) { return t ? { id: id, json: t } : null; });
+      });
+
       window.__storePrefetch = {
         // Promise<string|null>: store id from the URL slug or host resolve.
         storeId: storeIdPromise,
         // Promise<{id, json}|null>: raw JSON text of GET /store/public/store/{id}.
         store: storePromise,
+        // Promise<{id, json}|null>: GET .../products-to-show/public.
+        products: productsPromise,
+        // Promise<{id, json}|null>: GET /store/campaigns/active/{id}.
+        campaigns: campaignsPromise,
         // One-shot flags set by the Dart consumers (a second read must go to
         // the network, e.g. when the user navigates to another store).
         storeIdConsumed: false,
         storeConsumed: false,
+        productsConsumed: false,
+        campaignsConsumed: false,
         // localStorage key part for the splash identity cache below.
         cacheKey: slugId ? 'store:' + slugId : 'host:' + host
       };
@@ -318,7 +342,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "707390049";
+    const serviceWorkerVersion = "1303723626";
   </script>
 
   <script>
@@ -329,7 +353,7 @@
     // cache can never serve a stale bundle) and the update checker at the
     // bottom compares this baked id against the deployed one. In local dev the
     // placeholder stays as-is and both mechanisms turn themselves off.
-    var appBuildId = '4cdf775-20260721100922';
+    var appBuildId = '6ae4927-20260721131316';
     var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
