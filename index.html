@@ -114,10 +114,31 @@
       width: 100%;
     }
 
+    /* Tile geometry (mirrored by _kTile* in store_brand_shell.dart). The
+       ring grows 1.25x, so the stage is 1.25x the tile. */
+    #app-splash {
+      --bl-tile: 240px;
+      --bl-stage: 300px;
+      --bl-radius: 52px;
+      --bl-ring-radius: 58px;
+      --bl-pad: 20px;
+      --bl-initial: 96px;
+    }
+    @media (max-width: 480px) {
+      #app-splash {
+        --bl-tile: 180px;
+        --bl-stage: 225px;
+        --bl-radius: 40px;
+        --bl-ring-radius: 45px;
+        --bl-pad: 16px;
+        --bl-initial: 72px;
+      }
+    }
+
     #app-splash .bl-mark {
       position: relative;
-      width: 200px;
-      height: 200px;
+      width: var(--bl-stage);
+      height: var(--bl-stage);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -125,9 +146,9 @@
 
     #app-splash .bl-ring {
       position: absolute;
-      width: 128px;
-      height: 128px;
-      border-radius: 32px;
+      width: var(--bl-tile);
+      height: var(--bl-tile);
+      border-radius: var(--bl-ring-radius);
       border: 2px solid var(--bl-brand);
       opacity: 0;
       animation: bl-pulse 2.2s ease-out infinite;
@@ -135,14 +156,14 @@
 
     @keyframes bl-pulse {
       0% { transform: scale(1); opacity: 0.55; }
-      100% { transform: scale(1.55); opacity: 0; }
+      100% { transform: scale(1.25); opacity: 0; }
     }
 
     #app-splash .bl-disc {
       position: relative;
-      width: 128px;
-      height: 128px;
-      border-radius: 28px;
+      width: var(--bl-tile);
+      height: var(--bl-tile);
+      border-radius: var(--bl-radius);
       background: #F1EFF2;
       border: 1px solid var(--bl-line);
       overflow: hidden;
@@ -159,7 +180,7 @@
     #app-splash .bl-initial {
       display: none;
       font-family: Georgia, 'Times New Roman', serif;
-      font-size: 52px;
+      font-size: var(--bl-initial);
       font-weight: 700;
       color: #FFFFFF;
       line-height: 1;
@@ -173,7 +194,7 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      padding: 12px;
+      padding: var(--bl-pad);
       box-sizing: border-box;
       opacity: 0;
       transition: opacity 0.25s ease;
@@ -398,7 +419,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "882429277";
+    const serviceWorkerVersion = "2458491529";
   </script>
 
   <script>
@@ -409,7 +430,7 @@
     // cache can never serve a stale bundle) and the update checker at the
     // bottom compares this baked id against the deployed one. In local dev the
     // placeholder stays as-is and both mechanisms turn themselves off.
-    var appBuildId = '271df5b-20261107160949';
+    var appBuildId = '56335a1-20261107173009';
     var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
