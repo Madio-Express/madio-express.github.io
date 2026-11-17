@@ -67,7 +67,16 @@
   <meta name="theme-color" content="#e6f3fc">
 
   <title>Tienda Virtual</title>
-  <link rel="manifest" href="manifest.json">
+  <!-- No <link rel="manifest"> on purpose: the storefront must never offer
+       "Install app". The manifest has been display:"browser" since 2026-06-22,
+       but the edge-proxy serves the unversioned manifest.json as immutable
+       for a year, so phones that visited before that date still hold the old
+       installable copy (display:"standalone") and Chrome on Android kept
+       offering the install. Without the link there is nothing to install. -->
+  <script>
+    // Belt and braces: swallow Chrome's install prompt if it ever fires.
+    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); });
+  </script>
 
   <!-- Instant splash shown before the Flutter engine boots, so the user never
        stares at a blank white page while main.dart.js + CanvasKit download.
@@ -425,7 +434,7 @@
     // cache can never serve a stale bundle) and the update checker at the
     // bottom compares this baked id against the deployed one. In local dev the
     // placeholder stays as-is and both mechanisms turn themselves off.
-    var appBuildId = 'd422bfa-20261117113634';
+    var appBuildId = '9a35cb4-20261117124920';
     var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
