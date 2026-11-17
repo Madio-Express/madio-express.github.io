@@ -636,7 +636,7 @@
     // cache can never serve a stale bundle) and the update checker at the
     // bottom compares this baked id against the deployed one. In local dev the
     // placeholder stays as-is and both mechanisms turn themselves off.
-    var appBuildId = 'b28ee6b-20261117164738';
+    var appBuildId = 'dacdb9c-20261117171128';
     var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
@@ -868,9 +868,11 @@
       if (!pf || !pf.isHomeRoute || !splash || !pf.store || !pf.products) return;
 
       // Same families and weights the Flutter home uses, so text wraps alike.
+      // display=block: text waits for the font instead of painting in a
+      // fallback and reflowing (one less visible change while loading).
       var fonts = document.createElement('link');
       fonts.rel = 'stylesheet';
-      fonts.href = 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@600;700&family=Playfair+Display:wght@600;700&display=swap';
+      fonts.href = 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@600;700&family=Playfair+Display:wght@600;700&display=block';
       document.head.appendChild(fonts);
 
       // --- StoreTheme mirror --------------------------------------------
@@ -1083,13 +1085,56 @@
         return root;
       }
 
+      // What the preview needs, remembered from the last visit so a returning
+      // visitor gets the preview as the very first paint (no brand loader in
+      // between). Only public store fields; refreshed on every visit.
+      var CACHE_KEY = 'home_preview_v1:' + pf.cacheKey;
+      var current = null;
+      var root = null;
+
+      function snapshot(store, sellsOnline) {
+        return JSON.stringify({
+          id: store.id, name: store.name, slogan: store.slogan, logoUrl: store.logoUrl,
+          imageBanner: store.imageBanner, primaryColor: store.primaryColor,
+          secondaryColor: store.secondaryColor, tertiaryColor: store.tertiaryColor,
+          whatsapp: store.whatsapp, phone: store.phone, sellsOnline: !!sellsOnline
+        });
+      }
+      function show(snap) {
+        if (snap === current) return;
+        try {
+          var data = JSON.parse(snap);
+          var next = build(data, data.sellsOnline);
+          if (root && root.parentNode) root.parentNode.removeChild(root);
+          root = next;
+          current = snap;
+          splash.appendChild(root);
+          splash.classList.add('app-splash--preview');
+          window.__homePreviewShown = true;
+        } catch (e) {}
+      }
+      // Back to the brand loader: the cached preview no longer applies.
+      function hide() {
+        if (root && root.parentNode) root.parentNode.removeChild(root);
+        root = null;
+        current = null;
+        splash.classList.remove('app-splash--preview');
+        window.__homePreviewShown = false;
+      }
+      function forget() {
+        try { localStorage.removeItem(CACHE_KEY); } catch (e) {}
+      }
+
+      try {
+        var cached = localStorage.getItem(CACHE_KEY);
+        if (cached) show(cached);
+      } catch (e) {}
+
       Promise.all([pf.store, pf.products]).then(function (r) {
         if (!r[0] || !r[1] || !r[0].json || !r[1].json) return;
-        // Too late: Flutter already painted and the splash is on its way out.
-        if (!splash.parentNode || splash.classList.contains('app-splash--hidden')) return;
         var store, products;
         try { store = JSON.parse(r[0].json); products = JSON.parse(r[1].json); } catch (e) { return; }
-        if (!store || store.enable !== true || !Array.isArray(products)) return;
+        if (!store || !Array.isArray(products)) return;
         // Count what the home will list: the variants of a group are one card.
         var seen = {}, count = 0, sellsOnline = false;
         products.forEach(function (p) {
@@ -1099,24 +1144,38 @@
           if (!seen[key]) { seen[key] = true; count++; }
           if (p.buyable !== false) sellsOnline = true;
         });
-        if (count < 2) return;
+        var gone = !splash.parentNode || splash.classList.contains('app-splash--hidden');
+        if (store.enable !== true || count < 2) {
+          forget();
+          if (!gone && current) hide();
+          return;
+        }
+        var snap = snapshot(store, sellsOnline);
         try {
-          splash.appendChild(build(store, sellsOnline));
-          splash.classList.add('app-splash--preview');
-          window.__homePreviewShown = true;
+          localStorage.setItem(CACHE_KEY, snap);
+          // Same double key as the splash identity: a root visit on a custom
+          // domain is rewritten to /name_<id> by Flutter.
+          if (store.id != null) localStorage.setItem('home_preview_v1:store:' + store.id, snap);
         } catch (e) {}
+        if (gone) return;
+        // A preview already on screen follows the fresh data. A brand loader
+        // only turns into the preview while Flutter has not painted yet: once
+        // it has, the home is moments away and loader -> preview -> home would
+        // be one change too many.
+        if (current || !window.__flutterPainted) show(snap);
       });
     })();
   </script>
 
   <script>
-    // Remove the splash. As a brand loader it goes on Flutter's first frame
-    // (Flutter continues with the same loader, StoreBrandShell). As a home
-    // preview it stays until the Flutter home is painted underneath and says
-    // so with the `store-home-ready` event (dismissHtmlSplash in
-    // lib/data/store_prefetch_web.dart); leaving on the first frame would
-    // show content -> loader -> content. The 8s cap after the first frame
-    // makes sure a missed signal can never leave the page covered.
+    // Remove the splash. On a store home URL it stays, as brand loader or as
+    // home preview, until Flutter says the final screen is painted (the
+    // `store-home-ready` event, dismissHtmlSplash in
+    // lib/data/store_prefetch_web.dart): the visitor sees ONE change, splash
+    // -> store, instead of splash -> Flutter loader -> route animation ->
+    // store. The 8s cap after the first frame makes sure a missed signal can
+    // never leave the page covered. Everywhere else it goes on Flutter's
+    // first frame, as it always did.
     (function () {
       var gone = false;
       function remove() {
@@ -1129,9 +1188,11 @@
           if (splash.parentNode) splash.parentNode.removeChild(splash);
         }, 400);
       }
+      var pf = window.__storePrefetch;
       window.addEventListener('store-home-ready', remove);
       window.addEventListener('flutter-first-frame', function () {
-        if (window.__homePreviewShown) {
+        window.__flutterPainted = true;
+        if (pf && pf.isHomeRoute) {
           setTimeout(remove, 8000);
         } else {
           remove();
