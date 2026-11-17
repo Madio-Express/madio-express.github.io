@@ -636,7 +636,7 @@
     // cache can never serve a stale bundle) and the update checker at the
     // bottom compares this baked id against the deployed one. In local dev the
     // placeholder stays as-is and both mechanisms turn themselves off.
-    var appBuildId = 'dacdb9c-20261117171128';
+    var appBuildId = '4f1929d-20261117172749';
     var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
@@ -1100,14 +1100,27 @@
           whatsapp: store.whatsapp, phone: store.phone, sellsOnline: !!sellsOnline
         });
       }
+      // What the preview actually paints from a snapshot. Two sources of the
+      // same store (proxy seed, fresh JSON) differ in formatting only, and
+      // must not rebuild the preview: that would reload its images.
+      function visualKey(data) {
+        function text(v) { return String(v == null ? '' : v).replace(/\s+/g, ' ').trim(); }
+        function color(v) { return text(v).replace(/#/g, '').toLowerCase(); }
+        return [
+          text(data.name), text(data.slogan), text(data.logoUrl), text(data.imageBanner),
+          color(data.primaryColor), color(data.secondaryColor), color(data.tertiaryColor),
+          text(data.whatsapp != null ? data.whatsapp : data.phone) ? 'w' : '', data.sellsOnline ? 's' : ''
+        ].join('|');
+      }
       function show(snap) {
-        if (snap === current) return;
         try {
           var data = JSON.parse(snap);
+          var key = visualKey(data);
+          if (key === current) return;
           var next = build(data, data.sellsOnline);
           if (root && root.parentNode) root.parentNode.removeChild(root);
           root = next;
-          current = snap;
+          current = key;
           splash.appendChild(root);
           splash.classList.add('app-splash--preview');
           window.__homePreviewShown = true;
@@ -1125,10 +1138,20 @@
         try { localStorage.removeItem(CACHE_KEY); } catch (e) {}
       }
 
-      try {
-        var cached = localStorage.getItem(CACHE_KEY);
-        if (cached) show(cached);
-      } catch (e) {}
+      // First paint, before any fetch: the edge-proxy seed when it knows the
+      // store qualifies (custom domains, even on a first visit), else what the
+      // last visit left in localStorage.
+      var seed = window.__storeSeed;
+      var slug = pf.cacheKey.indexOf('store:') === 0 ? pf.cacheKey.slice(6) : null;
+      if (seed && typeof seed === 'object' && (!slug || String(seed.id) === slug) &&
+          seed.enable === true && seed.productCount >= 2) {
+        show(snapshot(seed, seed.sellsOnline));
+      } else {
+        try {
+          var cached = localStorage.getItem(CACHE_KEY);
+          if (cached) show(cached);
+        } catch (e) {}
+      }
 
       Promise.all([pf.store, pf.products]).then(function (r) {
         if (!r[0] || !r[1] || !r[0].json || !r[1].json) return;
