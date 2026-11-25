@@ -149960,14 +149960,14 @@ j.push(A.e9(!1,A.f("Cancelar",g,g,g,g,A.x().$2$color$fontWeight(B.bS,B.t),g,g),g
 return A.eJ(A.a3k(g,A.L(j,B.r,g,B.e,B.h),s.d),g,B.a_I,g,B.a4)},
 $S:128}
 A.b66.prototype={
-$1(a){return this.a.a4O(a,"Ingres\xe1 tu nombre")},
+$1(a){return this.a.a4O(a,"Ingresa tu nombre")},
 $S:22}
 A.b67.prototype={
-$1(a){return this.a.a4O(a,"Ingres\xe1 tu apellido")},
+$1(a){return this.a.a4O(a,"Ingresa tu apellido")},
 $S:22}
 A.b68.prototype={
 $1(a){var s
-if(a==null||B.c.M(a).length===0)return"Ingres\xe1 tu tel\xe9fono"
+if(a==null||B.c.M(a).length===0)return"Ingresa tu tel\xe9fono"
 s=A.b8("\\D",!0,!1,!1)
 if(A.bc(a,s,"").length<7)return"Tel\xe9fono demasiado corto"
 return null},
