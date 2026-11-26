@@ -475,7 +475,9 @@
     @media (min-width: 900px) {
       #app-splash .pv-name { font-size: 21px; }
       #app-splash .pv-links { display: flex; }
-      #app-splash .pv-hero-in { padding: 110px 24px; align-items: flex-start; text-align: left; }
+      /* Desktop: spans the 1160 px content column so the copy starts where the
+         section titles start (regression finding 137); mirrors HomeV2Hero. */
+      #app-splash .pv-hero-in { padding: 110px 24px; align-items: flex-start; text-align: left; flex: 1 1 auto; }
       #app-splash .pv-headline { font-size: 52px; }
       #app-splash .pv-cta { justify-content: flex-start; }
       #app-splash .pv-bottom { display: none; }
@@ -636,7 +638,7 @@
     // cache can never serve a stale bundle) and the update checker at the
     // bottom compares this baked id against the deployed one. In local dev the
     // placeholder stays as-is and both mechanisms turn themselves off.
-    var appBuildId = '1993ef8-20261125231441';
+    var appBuildId = '96f7feb-20261126164506';
     var appBuildIdIsReal = appBuildId.indexOf('__') !== 0;
   </script>
 
